@@ -7,11 +7,20 @@ import java.util.List;
 public interface UserScoreDao {
     /**
      * Get a list of all scores from the datastore.
-     * The list is never null. It is empty if there are no scores in the datastore.
+     * The list is never null. If it is empty if there are no scores in the datastore.
      *
      * @return all scores as a list of UserScore objects
      */
-    List<UserScore> getUserScores();
+    List<UserScore> getUserScores(int limit);
+
+    /**
+     * Get a list of all scores from the datastore that were added TODAY
+     * The list is never null. If it is empty if there are no scores in the datastore.
+     *
+     * @return all scores as a list of UserScore objects
+     */
+
+    List<UserScore> getUserScoresToday(int limit);
 
     /**
      * Get a user score from the datastore that has the given id.
@@ -22,11 +31,13 @@ public interface UserScoreDao {
      */
     UserScore getUserScoreById(int id);
 
+
     /**
      *
      * @param newUserScore the UserScore object to be added to the datastore
      * @return the updated UserScore object
      */
     UserScore createUserScore (UserScore newUserScore);
+
 
 }

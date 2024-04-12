@@ -2,6 +2,7 @@ package com.mccullough.highscore.dao;
 
 import com.mccullough.highscore.exception.DaoException;
 import com.mccullough.highscore.model.UserScore;
+import org.apache.catalina.User;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,13 +25,37 @@ public class JdbcUserScoreDao implements UserScoreDao{
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
     @Override
-    public List<UserScore> getUserScores() {
+    public List<UserScore> getUserScores(int limit) {
 
         List<UserScore> userScores = new ArrayList<>();
+        String sql = USER_SCORE_BASE_SQL + "ORDER BY score DESC LIMIT ?";
         try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(USER_SCORE_BASE_SQL + "ORDER BY score DESC;");
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, limit);
 
             while (results.next()) {
+                UserScore userScore = mapRowToUserScore(results);
+                userScores.add(userScore);
+            }
+        } catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Cannot connect to server or database");
+        } catch (DataIntegrityViolationException e) {
+            throw new DaoException("Data integrity violation", e);
+        }
+        return userScores;
+    }
+
+    @Override
+    public List<UserScore> getUserScoresToday(int limit) {
+        List<UserScore> userScores = new ArrayList<>();
+
+        String sql = USER_SCORE_BASE_SQL +
+                "WHERE date = CURRENT_DATE\n" +
+                "ORDER BY score DESC\n" +
+                "LIMIT ?;";
+        try {
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, limit);
+
+            while (results.next()){
                 UserScore userScore = mapRowToUserScore(results);
                 userScores.add(userScore);
             }

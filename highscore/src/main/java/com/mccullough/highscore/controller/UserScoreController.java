@@ -3,13 +3,11 @@ package com.mccullough.highscore.controller;
 import com.mccullough.highscore.dao.UserScoreDao;
 import com.mccullough.highscore.model.UserScore;
 import org.apache.catalina.User;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping (path = "/scores")
 public class UserScoreController {
@@ -21,9 +19,12 @@ public class UserScoreController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<UserScore> list() {
-            return userScoreDao.getUserScores();
+    public List<UserScore> list(@RequestParam(defaultValue = "10") int limit) {
+            return userScoreDao.getUserScores(limit);
     }
+
+    @RequestMapping(path = "/today", method = RequestMethod.GET)
+    public List<UserScore> listTodaysScores(@RequestParam(defaultValue = "10") int limit) { return userScoreDao.getUserScoresToday(limit);}
 
     @RequestMapping(method = RequestMethod.POST)
     public UserScore add (@RequestBody UserScore userScore) {
